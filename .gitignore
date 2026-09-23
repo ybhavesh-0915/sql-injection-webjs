@@ -1,0 +1,4 @@
+node_modules/
+sql-injection-lab.db
+npm-debug.log
+.git

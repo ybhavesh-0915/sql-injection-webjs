@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SQL Injection Lab</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <div class="eyebrow"><span class="dot"></span> LOCAL SECURITY LAB / SQLITE</div>
+      <h1>See the query.<br><em>Change the outcome.</em></h1>
+      <p class="intro">A hands-on sandbox for understanding how untrusted input changes SQL, and how one small design choice closes the door.</p>
+    </header>
+
+    <section class="lab-grid">
+      <form id="query-form" class="panel query-panel">
+        <div class="panel-top"><span>01 / INPUT</span><span class="status">LOCAL ONLY</span></div>
+        <label for="username">Username value</label>
+        <input id="username" name="username" value="alice" autocomplete="off" spellcheck="false">
+        <div class="quick-values" aria-label="Example inputs">
+          <button type="button" data-value="alice">alice</button>
+          <button type="button" data-value="' OR '1'='1">' OR '1'='1</button>
+          <button type="button" data-value="admin' --">admin' --</button>
+        </div>
+        <label for="level">Security level</label>
+        <select id="level" name="level">
+          <option value="vulnerable">Level 1 · Vulnerable</option>
+          <option value="filtered">Level 2 · Filtered</option>
+          <option value="secure">Level 3 · Parameterized</option>
+        </select>
+        <button class="run-button" type="submit"><span>Run query</span><span aria-hidden="true">↗</span></button>
+        <p class="warning">Demo database only. Never test payloads against systems you do not own or have explicit permission to assess.</p>
+      </form>
+
+      <section class="panel result-panel" aria-live="polite">
+        <div class="panel-top"><span>02 / RESPONSE</span><span id="result-badge" class="badge">READY</span></div>
+        <div id="result-summary" class="result-summary"><strong>Choose a payload</strong><span>Then compare all three security levels.</span></div>
+        <div class="query-box"><div class="box-label">SQL SENT TO DATABASE</div><code id="sql-output">Waiting for input...</code></div>
+        <div class="table-wrap">
+          <div class="box-label">ROWS RETURNED</div>
+          <table><thead><tr><th>ID</th><th>USERNAME</th><th>ROLE</th></tr></thead><tbody id="rows-output"><tr><td colspan="3" class="empty">No query run yet.</td></tr></tbody></table>
+        </div>
+      </section>
+    </section>
+
+    <section class="levels">
+      <div class="section-heading"><span>03 / THE THREE OUTCOMES</span><span>Same input. Different trust model.</span></div>
+      <div class="level-cards">
+        <article class="level-card vulnerable"><span class="number">01</span><h2>Raw concatenation</h2><p>The input is pasted directly into SQL. A quote can escape the intended value.</p></article>
+        <article class="level-card filtered"><span class="number">02</span><h2>Character filter</h2><p>Some patterns are rejected. This can reduce noise, but it is not a reliable boundary.</p></article>
+        <article class="level-card secure"><span class="number">03</span><h2>Prepared statement</h2><p>The database receives code and value separately. Input stays data.</p></article>
+      </div>
+    </section>
+    <footer>BUILT FOR LEARNING · RUNS ON 127.0.0.1 · IN-MEMORY DATASET</footer>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
