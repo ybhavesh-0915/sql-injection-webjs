@@ -1,5 +1,3 @@
-# Theory
-
 ## What is SQL Injection?
 
 SQL Injection (SQLi) is an input-validation attack in which untrusted data supplied by a user is interpreted as part of a SQL statement. Instead of remaining *data*, the input becomes *code* — changing the meaning of the query. It is one of the most severe and long-standing web application vulnerabilities (OWASP Top 10, CWE-89).
