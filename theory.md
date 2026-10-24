@@ -1,58 +1,69 @@
-## What is SQL Injection?
+# SQL Injection — Theory
 
-SQL Injection (SQLi) is an input-validation attack in which untrusted data supplied by a user is interpreted as part of a SQL statement. Instead of remaining *data*, the input becomes *code* — changing the meaning of the query. It is one of the most severe and long-standing web application vulnerabilities (OWASP Top 10, CWE-89).
+![How SQL injection turns data into code](https://raw.githubusercontent.com/ybhavesh-0915/sql-injection-webjs/main/images/how-sqli-works.svg)
 
-## How the vulnerability arises
+## 1 · What is SQL Injection?
 
-A vulnerable application builds SQL by concatenation:
+**SQL Injection (SQLi)** is an input-validation vulnerability in which untrusted user input is interpreted as part of an **SQL statement** instead of staying plain *data* — letting the attacker change what the query does. It is one of the most severe and long-standing web vulnerabilities, tracked as [CWE-89](https://cwe.mitre.org/data/definitions/89.html) and covered by the [OWASP SQL Injection guide](https://owasp.org/www-community/attacks/SQL_Injection) and the [PortSwigger Web Security Academy](https://portswigger.net/web-security/sql-injection).
+
+The classic entry point is a **login form**. Suppose the application builds its lookup by concatenation:
 
 ```js
 const sql = `SELECT * FROM users WHERE username = '${username}'`;
 ```
 
-The single quotes around `username` are only convention. If the user supplies
+Those single quotes are *convention*, not protection. Consider the input below being pasted into the username field:
 
-```
-' OR '1'='1' --
-```
+![SQL injection data becoming code — login form example](https://raw.githubusercontent.com/ybhavesh-0915/sql-injection-webjs/main/images/sql-injection-login-bypass.png)
 
-the statement becomes:
+*Figure: the payload cracks the SQL string so `'1'='1'` is read as a **predicate** (always true) and `--` comments out the rest — the query now returns **every** user.*
 
-```sql
-SELECT * FROM users WHERE username = '' OR '1'='1' --'
-```
+The attacker changed the *logic of the program* without touching a single line of source code — only the value in a text box.
 
-The predicate `'1'='1'` is always true and `--` comments out the rest, so the query returns **every** row instead of one user. The attacker changed the *logic* of the program without touching a line of source code.
+## 2 · Classification of SQL Injection
 
-## Classification of SQL Injection
+| Class | Channel | Sub-techniques |
+| --- | --- | --- |
+| **In-band (classic)** | Same channel carries attack & result | Error-based, UNION-based |
+| **Inferential (blind)** | No data in response — infer from behaviour | Boolean-based, time-based |
+| **Out-of-band** | Separate channel (DNS/HTTP callbacks) | Used when direct response is unreliable |
 
-| Type | Description |
-| --- | --- |
-| **In-band (classic)** | Result or error comes back on the same channel — error-based, UNION-based. |
-| **Inferential (blind)** | No data in the response; attacker infers from behaviour — boolean-based, time-based. |
-| **Out-of-band** | Data exfiltrated via a separate channel (DNS/HTTP callbacks). |
+A fuller taxonomy of the attack surface appears in the figure below:
 
-## Why blacklist filtering fails
+![Classification of SQL injection techniques](https://raw.githubusercontent.com/ybhavesh-0915/sql-injection-webjs/main/images/sqli-classification.png)
 
-A filter that blocks characters such as `' " ; -- /* */` only stops the *known* tricks:
+*Figure: a taxonomy of SQL-injection attack intent, injection sources and techniques — from Wikimedia Commons, [KD_SQLIA_Classification_2010](https://commons.wikimedia.org/wiki/File:KD_SQLIA_Classification_2010.png), CC BY-SA 3.0*
 
-- SQL is a rich language — many encodings and alternate syntaxes exist.
-- Filters must be exhaustive; a single miss re-opens the hole.
-- Character-level blocking breaks legitimate input (e.g. O'Brien, comments containing quotes).
+## 3 · Why Blacklist Filtering Fails
 
-Filtering is therefore treated as **defence in depth**, never the primary fix.
+A filter that blocks characters like `' " ; -- /* */` only stops the *known* tricks:
 
-## Prepared statements (the correct defence)
+- SQL offers **many encodings and alternate syntaxes**; every miss re-opens the hole.
+- Character blocking breaks **legitimate input** — think of a user named *O'Brien*.
+- New techniques will always exist; a *block list* must be perfect, a *safe construction* does not.
 
-A prepared statement separates the *query skeleton* from the *values*:
+Filtering is therefore treated as **defence in depth**, never as the primary fix.
+
+## 4 · The Correct Defence: Prepared Statements
+
+A prepared statement separates the **query skeleton** from the **values**:
+
+![Vulnerable concatenation vs parameterized queries](https://raw.githubusercontent.com/ybhavesh-0915/sql-injection-webjs/main/images/prepared-statement-defence.svg)
 
 ```js
 const stmt = db.prepare('SELECT * FROM users WHERE username = ?');
 stmt.all(username);
 ```
 
-The driver transmits the structure and the value separately, so the value is parsed **only as data**. Even input like `' OR '1'='1' --` simply matches no username. Other standard mitigations: least-privilege DB accounts, escaping as a last resort, and validating input by *type and shape* rather than by denying characters.
+The driver transmits **structure and value separately**, so the value is parsed *only as data*. Input like `' OR '1'='1' --` becomes a harmless string that simply matches no username. Full guidance lives in the [OWASP SQL Injection Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html); other standard layers include **least-privilege DB accounts**, **secure error handling** and **input validation by type and shape**, not by banned characters.
 
-## Lab context
+## 5 · In This Lab
 
-This lab runs a local Node.js HTTP server with an in-memory SQLite table `users` (alice / bob / admin). The same SQL is executed through three levels — vulnerable, filtered, and parameterized — so the difference in behaviour can be observed directly.
+This lab runs a local Node.js HTTP server with an in-memory SQLite table `users` (alice, bob, admin). The **same SQL** executes through three levels — **vulnerable**, **filtered**, and **parameterized** — so you can observe the difference in behaviour side by side.
+
+## 6 · Self-Check Questions
+
+1. What exactly does `--` do inside an SQL query, and why is it useful to an attacker?
+2. In the vulnerable query, which character splits `'1'='1'` into its own predicate?
+3. Give one *legitimate* login input that the Level-2 filter would wrongly reject.
+4. Why does the parameterized level return **no rows** for the same payload?
