@@ -1,5 +1,3 @@
-# SQL Injection — Objectives
-
 After completing this experiment, the student should be able to:
 
 1. **Explain** how a SQL query string is assembled from untrusted user input, and where the *code/data* boundary is lost.
