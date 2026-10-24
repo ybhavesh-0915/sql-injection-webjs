@@ -1,5 +1,3 @@
-# SQL Injection — Procedure
-
 > ⚠️ **Safety:** run everything locally. The server binds to `127.0.0.1` and uses an in-memory dataset — do **not** expose it to a network, and never test attacks against systems you do not own or have permission for.
 
 ## 1 · Setup
