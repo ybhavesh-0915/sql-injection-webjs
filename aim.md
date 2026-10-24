@@ -1,10 +1,3 @@
-# SQL Injection — Aim & Overview
-
-> 📌 **Experiment:** Understanding, Detecting and Preventing SQL Injection
-> **Source code:** [sql-injection-webjs on GitHub](https://github.com/ybhavesh-0915/sql-injection-webjs)
-
-## Aim
-
 To demonstrate how **SQL Injection (SQLi)** allows an attacker to change the *structure* of a database query through untrusted input, and to compare three ways of handling that input — **string concatenation** (vulnerable), a **character blacklist** (naive filter), and **parameterized queries** (correct fix) — on the *same* application and *same* dataset.
 
 ## At a Glance
