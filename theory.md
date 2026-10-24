@@ -1,5 +1,3 @@
-# SQL Injection — Theory
-
 ![How SQL injection turns data into code](https://raw.githubusercontent.com/ybhavesh-0915/sql-injection-webjs/main/images/how-sqli-works.svg)
 
 ## 1 · What is SQL Injection?
