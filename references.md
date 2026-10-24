@@ -1,5 +1,3 @@
-# SQL Injection — References
-
 ## Standards & Guidance
 
 1. **OWASP** — [SQL Injection community guide](https://owasp.org/www-community/attacks/SQL_Injection) · overview, attack forms, impact.
