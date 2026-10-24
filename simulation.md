@@ -1,5 +1,3 @@
-# Simulation
-
 The lab simulates a login-style lookup against an in-memory SQLite table.
 
 ## Dataset
